@@ -46,8 +46,8 @@ fun RecipesScreen(navigation: NavController, mainViewModel: MainViewModel) {
 
         topBar = {
             CustomToolbarScreen(navController = navigation, title = "Home", false)
-        },
-        bottomBar = { BottomBar() }
+        }
+
     )
     { innerPadding ->
 
@@ -163,5 +163,38 @@ private fun getReceipesListAPI(mainViewModel: MainViewModel) {
 @Preview(showBackground = true)
 @Composable
 fun previewScreen() {
+    // Contoh data untuk preview
+    val sampleRecipes = listOf(
+        Receipes.Recipe(
+            id = 1,
+            name = "Recipe 1",
+            image = "https://via.placeholder.com/150",
+            prepTimeMinutes = 10,
+            cookTimeMinutes = 20,
+            servings = 4,
+            ingredients = listOf("Ingredient 1", "Ingredient 2"),
+            instructions = listOf("Step 1", "Step 2")
+        ),
+        Receipes.Recipe(
+            id = 2,
+            name = "Recipe 2",
+            image = "https://via.placeholder.com/150",
+            prepTimeMinutes = 15,
+            cookTimeMinutes = 25,
+            servings = 3,
+            ingredients = listOf("Ingredient A", "Ingredient B"),
+            instructions = listOf("Step A", "Step B")
+        )
+    )
 
+    // Komposisi preview
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        RecipeList(recipes = sampleRecipes) { recipe ->
+            // Aksi saat item di klik
+        }
+    }
 }

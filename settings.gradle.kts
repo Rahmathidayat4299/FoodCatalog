@@ -22,3 +22,4 @@ dependencyResolutionManagement {
 rootProject.name = "ModularFoodCatalog"
 include(":app")
 include(":core")
+include(":favorite")

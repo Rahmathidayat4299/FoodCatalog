@@ -1,41 +1,21 @@
 plugins {
-    alias(libs.plugins.androidApplication)
+    alias(libs.plugins.androidDynamicFeature)
     alias(libs.plugins.jetbrainsKotlinAndroid)
-    alias(libs.plugins.roomKsp)
 }
-
 android {
-    namespace = "com.course.modularfoodcatalog"
+    namespace = "com.course.favorite"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.course.modularfoodcatalog"
         minSdk = 24
-        targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables {
-            useSupportLibrary = true
-        }
-    }
-
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-        }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
     buildFeatures {
         compose = true
@@ -48,11 +28,20 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
-    dynamicFeatures += setOf(":favorite")
+    buildTypes {
+        release {
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+    }
 }
 
 dependencies {
-
+    implementation(project(":app"))
+    implementation(project(":core"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -61,6 +50,10 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.material)
+    implementation(libs.androidx.activity)
+    implementation(libs.androidx.constraintlayout)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -68,23 +61,18 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    val lifecycle_version ="2.6.2"
-    val retrofit_version ="2.9.0"
-    val coroutine_version="1.7.3"
-    val room_version = "2.6.1"
-    val koin_version="3.4.0"
     //Koin
     implementation (libs.koin.android)
     implementation (libs.koin.androidx.compose)
-
+    //drawer
+    implementation(libs.androidx.drawerlayout)
     //Lifecycle
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation (libs.androidx.lifecycle.extensions)
     implementation( libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation (libs.androidx.activity.ktx)
-    //drawer
-    implementation(libs.androidx.drawerlayout)
+
     //Coroutines
     implementation (libs.kotlinx.coroutines.core)
     implementation (libs.kotlinx.coroutines.android)
@@ -102,14 +90,7 @@ dependencies {
     //Koil Image Dependency
     implementation(libs.coil.compose)
     implementation (libs.neumorphic)
-    implementation(project(":core"))
     // Room dependency
 
-    implementation(libs.androidx.room.ktx)
-    // To use Kotlin annotation processing tool (kapt)
-    ksp(libs.androidx.room.compiler)
-    implementation(libs.asset.delivery)
 
-    // For Kotlin users also import the Kotlin extensions library for Play Asset Delivery:
-    implementation(libs.asset.delivery.ktx)
 }

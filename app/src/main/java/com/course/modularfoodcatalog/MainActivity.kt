@@ -1,10 +1,13 @@
 package com.course.modularfoodcatalog
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -15,6 +18,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.course.core.utils.Routes
+import com.course.modularfoodcatalog.componentcompose.BottomBar
 import com.course.modularfoodcatalog.componentcompose.RecipeDetailScreen
 import com.course.modularfoodcatalog.componentcompose.RecipesScreen
 import com.course.modularfoodcatalog.ui.theme.ModularFoodCatalogTheme
@@ -36,37 +40,58 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-}
 
-@Composable
-fun MainContent() {
-    val mainViewModel: MainViewModel = koinViewModel()
-    ModularFoodCatalogTheme {
+    @Composable
+    fun MainContent() {
+        val mainViewModel: MainViewModel = koinViewModel()
         val navController = rememberNavController()
-        NavHost(navController = navController, startDestination = Routes.LIST_SCREEN) {
-            composable(Routes.LIST_SCREEN) {
-                RecipesScreen(navigation = navController, mainViewModel)
+
+        Scaffold(
+            bottomBar = {
+                BottomBar(navController = navController,onFavoriteClick = ::navigateToFavorite)
             }
-            composable(
-                Routes.DETAIL_SCREEN, arguments = listOf(navArgument("idValue") {
-                    type = NavType.IntType
-                })
-            ) { backStackEntry ->
-                RecipeDetailScreen(
-                    navController,
-                    mainViewModel,
-                    backStackEntry.arguments?.getInt(Routes.Values.IDVALUE, 0)
-                )
+        ) { innerPadding ->
+            NavHost(
+                navController = navController,
+                startDestination = Routes.LIST_SCREEN,
+                modifier = Modifier.padding(innerPadding)
+            ) {
+                composable(Routes.LIST_SCREEN) {
+                    RecipesScreen(navigation = navController, mainViewModel)
+                }
+                composable(
+                    Routes.DETAIL_SCREEN, arguments = listOf(navArgument("idValue") {
+                        type = NavType.IntType
+                    })
+                ) { backStackEntry ->
+                    RecipeDetailScreen(
+                        navController,
+                        mainViewModel,
+                        backStackEntry.arguments?.getInt(Routes.Values.IDVALUE, 0)
+                    )
+                }
+//            composable(Routes.FAVORITE_SCREEN) {
+//                FavoriteScreen(navController, mainViewModel)
+//            }
+                // Add other destinations here as needed, e.g., PROFILE_SCREEN
             }
         }
     }
-}
 
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    ModularFoodCatalogTheme {
+    @Preview(showBackground = true)
+    @Composable
+    fun GreetingPreview() {
+        ModularFoodCatalogTheme {
 
+        }
+    }
+     fun navigateToFavorite() {
+        val intent = Intent()
+        intent.setClassName(
+            "com.course.modularfoodcatalog",
+            "com.course.favorite.FavoriteActivity"
+        )
+        startActivity(intent)
     }
 }

@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.Flow
 interface RecipesDao {
 
     @Query("SELECT * FROM recipes")
-    fun getAllCarts(): Flow<List<RecipesEntity>>
+    fun getAllCarts(): List<RecipesEntity>
 
     @Query("SELECT * FROM recipes WHERE id == :recipesId")
     fun getCartById(recipesId: Int): Flow<RecipesEntity>

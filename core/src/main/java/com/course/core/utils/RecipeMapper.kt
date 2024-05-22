@@ -54,4 +54,29 @@ object RecipeMapper {
             mealType = Gson().fromJson(recipesEntity.mealType, Array<String>::class.java).toList()
         )
     }
+    fun RecipesEntity.toRecipes(): Receipes.Recipe {
+        return mapFromEntity(this)
+    }
+
+    fun Receipes.Recipe.toRecipesEntity(): RecipesEntity {
+        return RecipesEntity(
+            id = reviewCount ?: 0,
+            name = name ?: "",
+            ingredients = Gson().toJson(ingredients),
+            instructions = Gson().toJson(instructions),
+            prepTimeMinutes = prepTimeMinutes ?: 0,
+            cookTimeMinutes = cookTimeMinutes ?: 0,
+            servings = servings ?: 0,
+            difficulty = difficulty ?: "",
+            cuisine = cuisine ?: "",
+            caloriesPerServing = caloriesPerServing ?: 0,
+            tags = Gson().toJson(tags),
+            userId = userId ?: 0,
+            image = image ?: "",
+            rating = rating ?: 0.0,
+            reviewCount = reviewCount ?: 0,
+            mealType = Gson().toJson(mealType)
+        )
+    }
+
 }

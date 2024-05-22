@@ -6,6 +6,7 @@ import com.course.core.data.Receipes
 import com.course.core.data.Repository
 import com.course.core.data.local.CartRepository
 import com.course.core.data.local.RecipesEntity
+import com.course.core.utils.RecipeMapper
 import com.course.core.utils.UiState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,6 +32,10 @@ class MainViewModel(
 
     val _uiStateReceipeEntity = MutableStateFlow<UiState<RecipesEntity>>(UiState.Loading)
     val uiStateReceipeEntity: StateFlow<UiState<RecipesEntity>> = _uiStateReceipeEntity
+
+    val _uiStateReceipeEntityList = MutableStateFlow<UiState<List<RecipesEntity>>>(UiState.Loading)
+    val uiStateReceipeEntityList: StateFlow<UiState<List<RecipesEntity>>> = _uiStateReceipeEntityList
+
     fun getReceipesList() = viewModelScope.launch {
         repository.getReceipes(context).collect {
             when (it) {
@@ -74,6 +79,7 @@ class MainViewModel(
     fun saveCart() {
         viewModelScope.launch {
             val currentRecipesEntity = (_uiStateReceipeEntity.value as? UiState.Success)?.data
+
             if (currentRecipesEntity != null) {
                 try {
                     cartRepository.saveRecipes(currentRecipesEntity)
@@ -83,6 +89,19 @@ class MainViewModel(
                 }
             } else {
                 _uiStateReceipeEntity.value = UiState.Error("No RecipesEntity available to save")
+            }
+        }
+    }
+
+    fun getCart() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _uiStateReceipeEntityList.value = UiState.Loading
+            try {
+                val recipesEntityList = cartRepository.getRecipes()
+
+                _uiStateReceipeEntityList.value = UiState.Success(recipesEntityList)
+            } catch (e: Exception) {
+                _uiStateReceipeEntityList.value = UiState.Error(e.message ?: "Unknown error occurred")
             }
         }
     }

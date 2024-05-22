@@ -4,4 +4,6 @@
     <string name="menu_favorite">Favorite</string>
     <string name="menu_profile">Profile</string>
     <string name="favorite">Favorites</string>
+    <string name="cart">Cart</string>
+    <string name="title_favorite">favorite</string>
 </resources>
