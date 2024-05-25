@@ -21,8 +21,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -37,6 +40,7 @@ import com.course.core.utils.RecipeMapper
 import com.course.core.utils.UiState
 import com.course.modularfoodcatalog.viewmodels.MainViewModel
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun RecipeDetailScreen(navController: NavController, mainViewModel: MainViewModel, id: Int?) {
@@ -111,6 +115,17 @@ private fun getReceipesDetails(mainViewModel: MainViewModel, id: Int?) {
 
 @Composable
 fun RecipeDetailView(recipe: Receipes.Recipe, onSaveClick: () -> Unit) {
+ val mainViewModel: MainViewModel = koinViewModel()
+    val coroutineScope = rememberCoroutineScope()
+    var isRecipeSaved by remember { mutableStateOf(false) } // Memperbarui isRecipeSaved
+
+    LaunchedEffect(Unit) {
+        val id = recipe.id
+        if (id != null) {
+            isRecipeSaved = mainViewModel.checkSaveFood(id)
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -172,7 +187,7 @@ fun RecipeDetailView(recipe: Receipes.Recipe, onSaveClick: () -> Unit) {
             onClick = onSaveClick,
             modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
-            Text(text = "Simpan")
+            Text(text = if (isRecipeSaved) "Hapus" else "Simpan")
         }
     }
 }

@@ -3,23 +3,21 @@ package com.course.modularfoodcatalog.viewmodels
 import android.app.Application
 import androidx.lifecycle.viewModelScope
 import com.course.core.data.Receipes
-import com.course.core.data.Repository
-import com.course.core.data.local.CartRepository
+import com.course.core.data.domain.FoodUseCase
 import com.course.core.data.local.RecipesEntity
-import com.course.core.utils.RecipeMapper
 import com.course.core.utils.UiState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import org.koin.core.logger.KOIN_TAG
 
 /**
  *hrahm,23/04/2024, 18:59
  **/
 class MainViewModel(
-    private val repository: Repository,
     application: Application,
-    private val cartRepository: CartRepository
+    private val useCase: FoodUseCase
 ) :
     BaseViewModel(application) {
 
@@ -36,8 +34,19 @@ class MainViewModel(
     val _uiStateReceipeEntityList = MutableStateFlow<UiState<List<RecipesEntity>>>(UiState.Loading)
     val uiStateReceipeEntityList: StateFlow<UiState<List<RecipesEntity>>> = _uiStateReceipeEntityList
 
+    fun checkSaveFood(id: Int): Boolean {
+        var isSaved = false
+        viewModelScope.launch {
+            isSaved = useCase.isRecipeSaved(id)
+        }
+        return isSaved
+    }
+
+
+
+
     fun getReceipesList() = viewModelScope.launch {
-        repository.getReceipes(context).collect {
+        useCase.getRecipes(context).collect {
             when (it) {
                 is UiState.Success -> {
                     _uiStateReceipeList.value = UiState.Success(it.data)
@@ -55,8 +64,8 @@ class MainViewModel(
         }
     }
 
-    fun getReceipeDetail(id: Int?) = viewModelScope.launch {
-        repository.getReceipesDetail(context, id).collect {
+    fun getReceipeDetail(id: Int?) = viewModelScope.launch(Dispatchers.IO) {
+        useCase.getRecipeDetail(context, id).collect {
             when (it) {
                 is UiState.Success -> {
                     _uiStateReceipeDetail.value = UiState.Success(it.data)
@@ -76,13 +85,30 @@ class MainViewModel(
     fun setCurrentRecipesEntity(recipesEntity: RecipesEntity) {
         _uiStateReceipeEntity.value = UiState.Success(recipesEntity)
     }
+
+    //    fun saveCart() {
+//        viewModelScope.launch {
+//            val currentRecipesEntity = (_uiStateReceipeEntity.value as? UiState.Success)?.data
+//
+//            if (currentRecipesEntity != null) {
+//                try {
+//                    cartRepository.saveRecipes(currentRecipesEntity)
+//                    _uiStateReceipeEntity.value = UiState.Success(currentRecipesEntity)
+//                } catch (e: Exception) {
+//                    _uiStateReceipeEntity.value = UiState.Error(e.message ?: "Unknown error occurred")
+//                }
+//            } else {
+//                _uiStateReceipeEntity.value = UiState.Error("No RecipesEntity available to save")
+//            }
+//        }
+//    }
     fun saveCart() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val currentRecipesEntity = (_uiStateReceipeEntity.value as? UiState.Success)?.data
 
             if (currentRecipesEntity != null) {
                 try {
-                    cartRepository.saveRecipes(currentRecipesEntity)
+                    useCase.saveRecipe(currentRecipesEntity)
                     _uiStateReceipeEntity.value = UiState.Success(currentRecipesEntity)
                 } catch (e: Exception) {
                     _uiStateReceipeEntity.value = UiState.Error(e.message ?: "Unknown error occurred")
@@ -97,7 +123,7 @@ class MainViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             _uiStateReceipeEntityList.value = UiState.Loading
             try {
-                val recipesEntityList = cartRepository.getRecipes()
+                val recipesEntityList = useCase.getSavedRecipes()
 
                 _uiStateReceipeEntityList.value = UiState.Success(recipesEntityList)
             } catch (e: Exception) {
@@ -106,5 +132,20 @@ class MainViewModel(
         }
     }
 
+    fun deleteCart() {
+        val currentRecipesEntity = (_uiStateReceipeEntity.value as? UiState.Success)?.data
+        viewModelScope.launch(Dispatchers.IO) {
+            if (currentRecipesEntity != null) {
+                try {
+                    useCase.deleteRecipe(currentRecipesEntity)
+                    _uiStateReceipeEntity.value = UiState.Success(currentRecipesEntity)
+                } catch (e: Exception) {
+                    _uiStateReceipeEntity.value = UiState.Error(e.message ?: "Unknown error occurred")
+                }
+            } else {
+                _uiStateReceipeEntity.value = UiState.Error("No RecipesEntity available to save")
+            }
+        }
+    }
 
 }

@@ -1,12 +1,16 @@
 package com.course.core.di
 
 
-import com.course.core.data.Repository
+import com.course.core.data.FoodRepository
+import com.course.core.data.FoodRepositoryImpl
+import com.course.core.data.domain.FoodInteractor
+import com.course.core.data.domain.FoodUseCase
 import com.course.core.data.local.AppDatabase
-import com.course.core.data.local.CartRepository
 import com.course.core.data.local.datasource.LocalDataSource
+import com.course.core.data.local.datasource.LocalDataSourceImpl
 import com.course.core.data.remote.ApiService
 import com.course.core.data.remote.RemoteDataSource
+import com.course.core.data.remote.RemoteDataSourceImpl
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.Module
 import org.koin.dsl.module
@@ -20,23 +24,22 @@ object AppModule {
 
     }
     val localModule = module {
-
-        factory { LocalDataSource(get()) }
-        factory { AppDatabase.getInstance(androidContext()) }
-        factory { get<AppDatabase>().recipesDao() }
+        single<LocalDataSource> { LocalDataSourceImpl(get()) }
+        single { AppDatabase.getInstance(androidContext()) }
+        single { get<AppDatabase>().recipesDao() }
     }
     val remoteDataSourceModule = module {
-        factory { RemoteDataSource(get()) }
-
+        single<RemoteDataSource> { RemoteDataSourceImpl(get()) }
     }
 
 
     val repositoryModule = module {
-        factory { CartRepository(get()) }
-        factory { Repository(get()) }
+        single<FoodRepository> { FoodRepositoryImpl(get(), get()) }
+        single<FoodUseCase> { FoodInteractor(get()) }
     }
 
     val module: List<Module> = listOf(
-        remoteDataSourceModule, networkModules, repositoryModule, localModule
+        networkModules, localModule, remoteDataSourceModule, repositoryModule
     )
+
 }

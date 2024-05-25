@@ -1,15 +1,12 @@
 package com.course.core.data.local
 
-import com.course.core.data.local.datasource.LocalDataSource
-import com.course.core.utils.RecipeMapper
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.toList
+import com.course.core.data.local.datasource.LocalDataSourceImpl
 
 /**
  *hrahm,12/05/2024, 09:25
  **/
 class CartRepository(
-    private val localDataSource: LocalDataSource,
+    private val localDataSource: LocalDataSourceImpl,
 ) {
     private var currentRecipesEntity: RecipesEntity? = null
     fun setCurrentRecipes(recipesEntity: RecipesEntity) {
