@@ -2,6 +2,7 @@ package com.course.core.data.local.datasource
 
 import com.course.core.data.local.RecipesEntity
 import com.course.core.data.local.dao.RecipesDao
+import kotlinx.coroutines.flow.firstOrNull
 
 /**
  *hrahm,12/05/2024, 09:15
@@ -23,7 +24,8 @@ class LocalDataSourceImpl(
 
     override suspend fun deleteRecipes(recipes: RecipesEntity) = dao.deleteCart(recipes)
     override suspend fun isRecipeSaved(recipeId: Int?): Boolean {
-        val recipe = recipeId?.let { dao.getCartById(it) }
+        if (recipeId == null) return false
+        val recipe = dao.getCartById(recipeId).firstOrNull()
         return recipe != null
     }
 

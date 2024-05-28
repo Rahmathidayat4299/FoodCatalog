@@ -59,10 +59,5 @@ class FoodRepositoryImpl(
         localDataSource.deleteRecipes(recipesEntity)
     }
 
-    override suspend fun isRecipeSaved(recipeId: Int?): Boolean {
-        // Mengambil resep dari database lokal berdasarkan ID
-        val recipe = recipeId?.let { localDataSource.isRecipeSaved(recipeId) }
-        // Mengembalikan true jika resep ditemukan, false jika tidak
-        return recipe != null
-    }
+    override suspend fun isRecipeSaved(recipeId: Int?):Boolean = recipeId.let { localDataSource.isRecipeSaved(recipeId) }
 }

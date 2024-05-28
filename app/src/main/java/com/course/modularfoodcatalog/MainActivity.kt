@@ -70,10 +70,6 @@ class MainActivity : ComponentActivity() {
                         backStackEntry.arguments?.getInt(Routes.Values.IDVALUE, 0)
                     )
                 }
-//            composable(Routes.FAVORITE_SCREEN) {
-//                FavoriteScreen(navController, mainViewModel)
-//            }
-                // Add other destinations here as needed, e.g., PROFILE_SCREEN
             }
         }
     }

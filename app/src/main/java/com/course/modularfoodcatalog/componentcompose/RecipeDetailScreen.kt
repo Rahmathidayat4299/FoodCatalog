@@ -2,7 +2,6 @@ package com.course.modularfoodcatalog.componentcompose
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
-
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -39,8 +38,8 @@ import com.course.core.data.Receipes
 import com.course.core.utils.RecipeMapper
 import com.course.core.utils.UiState
 import com.course.modularfoodcatalog.viewmodels.MainViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun RecipeDetailScreen(navController: NavController, mainViewModel: MainViewModel, id: Int?) {
@@ -76,22 +75,29 @@ fun RecipeDetailScreen(navController: NavController, mainViewModel: MainViewMode
         ) {
             LaunchedEffect(key1 = Unit) {
                 getReceipesDetails(mainViewModel, id)
+                id?.let { mainViewModel.checkSaveFood(it) }
             }
             val state = mainViewModel.uiStateReceipeDetail.collectAsState()
             when (state.value) {
                 is UiState.Success -> {
                     ProgressLoader(isLoading = false)
                     (state.value as UiState.Success<Receipes.Recipe>).data?.let { recipe ->
-                        RecipeDetailView(recipe = recipe) {
-                            val recipesEntity = RecipeMapper.mapToEntity(recipe)
-                            mainViewModel.setCurrentRecipesEntity(recipesEntity)
-                            val result = mainViewModel.saveCart()
-                            if (result != null) {
-                                coroutineScope.launch {
-                                    snackbarHostState.showSnackbar("Resep disimpan!")
-                                }
-                            }
-                        }
+                        RecipeDetailView(
+                            recipe = recipe,
+                            snackbarHostState,
+                            mainViewModel,
+                            coroutineScope
+                        )
+//                        RecipeDetailView(recipe = recipe) {
+//                            val recipesEntity = RecipeMapper.mapToEntity(recipe)
+//                            mainViewModel.setCurrentRecipesEntity(recipesEntity)
+//                            val result = mainViewModel.saveCart()
+//                            if (result != null) {
+//                                coroutineScope.launch {
+//                                    snackbarHostState.showSnackbar("Resep disimpan!")
+//                                }
+//                            }
+//                        }
                     }
                 }
 
@@ -114,17 +120,22 @@ private fun getReceipesDetails(mainViewModel: MainViewModel, id: Int?) {
 }
 
 @Composable
-fun RecipeDetailView(recipe: Receipes.Recipe, onSaveClick: () -> Unit) {
- val mainViewModel: MainViewModel = koinViewModel()
-    val coroutineScope = rememberCoroutineScope()
-    var isRecipeSaved by remember { mutableStateOf(false) } // Memperbarui isRecipeSaved
+fun RecipeDetailView(
+    recipe: Receipes.Recipe,
+    snackbarHostState: SnackbarHostState,
+    mainViewModel: MainViewModel,
+    coroutineScope: CoroutineScope
+) {
+    var isRecipeSaved by remember { mutableStateOf(false) }
+    val isRecipeSavedState by mainViewModel.isRecipeSaved.collectAsState()
 
     LaunchedEffect(Unit) {
-        val id = recipe.id
-        if (id != null) {
-            isRecipeSaved = mainViewModel.checkSaveFood(id)
-        }
+        recipe.id?.let { mainViewModel.checkSaveFood(it) }
     }
+    LaunchedEffect(isRecipeSavedState) {
+        isRecipeSaved = isRecipeSavedState
+    }
+
 
     Column(
         modifier = Modifier
@@ -184,10 +195,28 @@ fun RecipeDetailView(recipe: Receipes.Recipe, onSaveClick: () -> Unit) {
         }
         Spacer(modifier = Modifier.height(16.dp))
         Button(
-            onClick = onSaveClick,
+            onClick = {
+                val recipesEntity = RecipeMapper.mapToEntity(recipe)
+                mainViewModel.setCurrentRecipesEntity(recipesEntity)
+                if (isRecipeSaved) {
+                     mainViewModel.deleteCart()
+                    coroutineScope.launch {
+                        snackbarHostState.showSnackbar("Resep delete!")
+                        isRecipeSaved = false
+                    }
+                } else {
+                     mainViewModel.saveCart()
+                    coroutineScope.launch {
+                        snackbarHostState.showSnackbar("Resep Save!")
+                        isRecipeSaved = true
+                    }
+                }
+
+
+            },
             modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
-            Text(text = if (isRecipeSaved) "Hapus" else "Simpan")
+            Text(text = if (isRecipeSaved) "Delete" else "Save")
         }
     }
 }

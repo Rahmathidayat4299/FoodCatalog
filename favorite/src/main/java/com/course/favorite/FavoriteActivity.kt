@@ -8,7 +8,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -16,12 +15,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,7 +25,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -84,10 +78,7 @@ class FavoriteActivity : ComponentActivity() {
                         ProgressLoader(isLoading = false)
                         val cartItems = (state.value as UiState.Success<List<RecipesEntity>>).data
                         if (cartItems?.isNotEmpty() == true) {
-                            CartList(cartItems = cartItems, onDeleteItem = { deletedItem ->
-                                // Menghapus item dari daftar
-                                mainViewModel.deleteCart()
-                            })
+                            CartList(cartItems = cartItems)
                         } else {
                             Text(
                                 text = "No Data"
@@ -108,26 +99,20 @@ class FavoriteActivity : ComponentActivity() {
         }
     }
 
-//    @Composable
-//    fun CartList(cartItems: List<RecipesEntity>) {
-//        LazyColumn {
-//            items(cartItems) { cartItem ->
-//                CartListItem(cartItem)
-//            }
-//        }
-//    }
-@Composable
-fun CartList(cartItems: List<RecipesEntity>, onDeleteItem: (RecipesEntity) -> Unit) {
-    LazyColumn {
-        items(cartItems) { cartItem ->
-            CartListItem(cartItem, onDeleteClick = { onDeleteItem(cartItem) })
+    @Composable
+    fun CartList(cartItems: List<RecipesEntity>) {
+        LazyColumn {
+            items(cartItems) { cartItem ->
+                CartListItem(cartItem)
+            }
         }
     }
-}
+
+
 
 
     @Composable
-    fun CartListItem(cartItem: RecipesEntity,onDeleteClick: () -> Unit) {
+    fun CartListItem(cartItem: RecipesEntity) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -171,13 +156,6 @@ fun CartList(cartItems: List<RecipesEntity>, onDeleteItem: (RecipesEntity) -> Un
                     )
 
                 }
-                IconButton(onClick = onDeleteClick) {
-                    Icon(
-                        imageVector = Icons.Filled.Delete,
-                        contentDescription = "Delete",
-                        tint = Color.Gray
-                    )
-                }
             }
         }
     }
@@ -203,7 +181,7 @@ fun CartList(cartItems: List<RecipesEntity>, onDeleteItem: (RecipesEntity) -> Un
             reviewCount = 100,
             mealType = "Lunch"
         )
-        CartListItem(recipe, onDeleteClick = {})
+        CartListItem(recipe)
     }
 
 }

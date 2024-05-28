@@ -10,7 +10,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import org.koin.core.logger.KOIN_TAG
 
 /**
  *hrahm,23/04/2024, 18:59
@@ -34,12 +33,13 @@ class MainViewModel(
     val _uiStateReceipeEntityList = MutableStateFlow<UiState<List<RecipesEntity>>>(UiState.Loading)
     val uiStateReceipeEntityList: StateFlow<UiState<List<RecipesEntity>>> = _uiStateReceipeEntityList
 
-    fun checkSaveFood(id: Int): Boolean {
-        var isSaved = false
+    private val _isRecipeSaved = MutableStateFlow<Boolean>(false)
+    val isRecipeSaved: StateFlow<Boolean> get() = _isRecipeSaved
+    fun checkSaveFood(id: Int) {
         viewModelScope.launch {
-            isSaved = useCase.isRecipeSaved(id)
+            val isSaved = useCase.isRecipeSaved(id)
+            _isRecipeSaved.value = isSaved
         }
-        return isSaved
     }
 
 
@@ -137,7 +137,7 @@ class MainViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             if (currentRecipesEntity != null) {
                 try {
-                    useCase.deleteRecipe(currentRecipesEntity)
+                   val result = useCase.deleteRecipe(currentRecipesEntity)
                     _uiStateReceipeEntity.value = UiState.Success(currentRecipesEntity)
                 } catch (e: Exception) {
                     _uiStateReceipeEntity.value = UiState.Error(e.message ?: "Unknown error occurred")

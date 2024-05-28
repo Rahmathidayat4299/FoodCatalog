@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Icon
@@ -44,8 +45,8 @@ fun BottomBar(
                 route = Routes.LIST_SCREEN
             ),
             BottomBarItem(
-                title = stringResource(R.string.cart),
-                icon = Icons.Default.ShoppingCart,
+                title = stringResource(R.string.favorite),
+                icon = Icons.Default.Favorite,
                 route = Routes.FAVORITE_SCREEN,
                 isActivity = true
             ),
@@ -61,7 +62,7 @@ fun BottomBar(
             NavigationBarItem(modifier = Modifier.padding(0.dp),
                 icon = {
                     Box(
-                        modifier = Modifier.padding(horizontal = 16.dp) // Adjust padding values as needed
+                        modifier = Modifier.padding(horizontal = 16.dp)
                     ) {
                         Icon(
                             imageVector = it.icon,
@@ -107,6 +108,8 @@ data class BottomBarItem(
 @Composable
 fun Preview() {
 
-//    BottomBar()
+    BottomBar(
+        onFavoriteClick = {}
+    )
 
 }

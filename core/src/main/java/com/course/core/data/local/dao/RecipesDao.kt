@@ -5,7 +5,6 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Update
 import com.course.core.data.local.RecipesEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -24,15 +23,7 @@ interface RecipesDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCart(cart: RecipesEntity): Long
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertCarts(cart: List<RecipesEntity>)
-
     @Delete
     suspend fun deleteCart(cart: RecipesEntity): Int
 
-    @Update
-    suspend fun updateCart(cart: RecipesEntity): Int
-
-    @Query("DELETE FROM recipes")
-    suspend fun deleteAll()
 }
