@@ -1,7 +1,9 @@
 package com.course.core.data.remote
 
+
 import com.course.core.data.Receipes
 import com.course.core.utils.Constants.Companion.BASE_URL
+import okhttp3.CertificatePinner
 import okhttp3.OkHttpClient
 import retrofit2.Response
 import retrofit2.Retrofit
@@ -26,10 +28,14 @@ interface ApiService {
         operator fun invoke(
 
         ): ApiService {
+            val hostname = "dummyjson.com"
+            val certificatePinner = CertificatePinner.Builder()
+                .add(hostname, "sha256/XgN0BIZQtZWR41iuNsVuOCfhfPY8TvLkdqWNobXsOuA=")
+                .build()
             val okHttpClient = OkHttpClient.Builder()
-
                 .connectTimeout(120, TimeUnit.SECONDS)
                 .readTimeout(120, TimeUnit.SECONDS)
+                .certificatePinner(certificatePinner)
                 .build()
             val retrofit = Retrofit.Builder()
                 .baseUrl(BASE_URL)

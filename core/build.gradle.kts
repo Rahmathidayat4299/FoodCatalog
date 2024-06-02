@@ -17,7 +17,7 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -95,4 +95,7 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     // To use Kotlin annotation processing tool (kapt)
     ksp(libs.androidx.room.compiler)
+    //sql chipper
+    implementation (libs.android.database.sqlcipher)
+    implementation (libs.androidx.sqlite.ktx)
 }

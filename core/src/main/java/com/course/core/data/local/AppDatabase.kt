@@ -5,6 +5,8 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.course.core.data.local.dao.RecipesDao
+import net.sqlcipher.database.SQLiteDatabase
+import net.sqlcipher.database.SupportFactory
 
 /**
  *hrahm,12/05/2024, 09:06
@@ -19,14 +21,15 @@ abstract class AppDatabase : RoomDatabase() {
 
     companion object {
         const val DATABASE_NAME = "recipes_db"
+
+        val passphrase: ByteArray = SQLiteDatabase.getBytes("dicoding".toCharArray())
+        val factory = SupportFactory(passphrase)
         fun getInstance(context: Context): AppDatabase {
             return Room.databaseBuilder(
                 context.applicationContext,
                 AppDatabase::class.java,
                 DATABASE_NAME
-            )
-                .fallbackToDestructiveMigration()
-                .build()
+            ).fallbackToDestructiveMigration().openHelperFactory(factory).build()
         }
     }
 }
